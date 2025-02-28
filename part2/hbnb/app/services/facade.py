@@ -8,7 +8,7 @@ class HBnBFacade:
         self.amenity_repo = InMemoryRepository()
 
     # Placeholder method for creating a user
-    def create_user(self.user_data):
+    def create_user(self, user_data):
         # Logic will be implemented in later tasks
         pass
 
