@@ -8,6 +8,7 @@ class BaseModel:
         self.updated_at = updated_at or datetime.utcnow() # Last updated timestamp
 
     def save(self):
+        """ Updated the 'updated_at' timestamp whenever the object is saved. """
         self.updated_at = datetime.utcnow()
 
     def update(self, data):
