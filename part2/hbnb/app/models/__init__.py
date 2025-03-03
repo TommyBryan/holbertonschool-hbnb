@@ -1,6 +1,6 @@
-from app.models.user import User
-from app.models.place import Place
-from app.models.review import Review
-from app.models.ammenity import Amenity
+from .user import User
+from .place import Place
+from .review import Review
+from .amenity import Amenity
 
 __all__ = ['User', 'Place', 'Review', 'Amenity']
