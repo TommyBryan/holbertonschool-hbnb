@@ -7,6 +7,9 @@ class BaseModel:
         self.created_at = created_at or datetime.utcnow() # Creation timestamp
         self.updated_at = updated_at or datetime.utcnow() # Last updated timestamp
 
+    def save(self):
+        self.updated_at = datetime.utcnow()
+
     def update(self, data):
         """ Update the object with the data provided. """
         for key, value in data.items():
