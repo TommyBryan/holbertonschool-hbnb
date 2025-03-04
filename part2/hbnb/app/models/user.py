@@ -8,6 +8,7 @@ class User(BaseModel):
         self.last_name = self.validate_name(last_name)
         self.email = self.validate_email(email)
         self.is_admin = is_admin
+        self.places = []  # List to store places owned by the user
 
     def validate_name(self, name):
         if not isinstance(name, str) or len(name) > 50:
@@ -19,7 +20,10 @@ class User(BaseModel):
         if not re.match(email_regex, email):
             raise ValueError("Invalid email address")
         return email
-    
+
+    def add_place(self, place):
+        """Add a place to the user's list of owned places."""
+        self.places.append(place)
 
     def to_dict(self):
         """ Converts user object to dictionary but exclude sensitive data like passwords."""
