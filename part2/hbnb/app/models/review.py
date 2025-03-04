@@ -19,7 +19,5 @@ class Review(BaseModel):
         self.place = place
 
     def set_user(self, user):
-
-
-
-        self.user = user        """Set the user for the review."""
+        """Set the user for the review."""
+        self.user = user
