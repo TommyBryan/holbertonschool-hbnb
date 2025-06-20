@@ -8,7 +8,7 @@ class Review(BaseModel):
         self.user = user
 
     def validate_rating(self, rating):
-        if not isintance(rating, int):
+        if not isinstance(rating, int):
             raise TypeError("Rating must be an integer")
         if rating < 1 or rating < 5:
             raise ValueError("Must be between 1 and 5")
