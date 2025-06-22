@@ -1,5 +1,7 @@
 from base_class import BaseModel
 from user import User
+from review import Review
+from amenity import Amenity
 
 class Place(BaseModel):
     def __init__(self, title, price, latitude, longitude, owner, description=""):
@@ -10,6 +12,36 @@ class Place(BaseModel):
         self.latitude = latitude
         self.longitude = longitude
         self.owner = owner
+        self._reviews = []  # List to store related reviews
+        self._amenities = []  # List to store related amenities
+
+    def add_review(self, review):
+        """ Add a review to the place."""
+        if not isinstance(review, Review):
+            raise TypeError("Review must be an instance of Review")
+        self._reviews.append(review)
+
+    def remove_review(self, review):
+        """ Remove a review from the place."""
+        if review in self._reviews:
+            self._reviews.remove(review)
+        
+    @property
+    def reviews(self):
+        """
+        Get the list of reviews of the place.
+        
+        Returns:
+            list: List of Reviews.
+        """
+        return self._reviews
+    
+    @reviews.setter
+    def reviews(self, reviews):
+        if not isinstance(reviews, list):
+            raise TypeError("Reviews must be a list")
+        self._reviews = []
+
 
     @property
     def title(self):

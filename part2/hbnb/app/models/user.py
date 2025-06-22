@@ -8,6 +8,39 @@ class User(BaseModel):
         self.last_name = last_name
         self.email = email
         self.is_admin = is_admin
+        self.places = []  # List to store related places
+
+    @property
+    def places(self):
+        """
+        Get the list of places associated with the user.
+        
+        Returns:
+            list: List of Place objects.
+        """
+        return self._places
+    
+    @places.setter
+    def places(self, places):
+        if not isinstance(places, list):
+            raise TypeError("Places must be a list")
+        for place in places:
+            from place import Place
+            if not isinstance(place, Place):
+                raise TypeError("All items in places must be Place instances")
+        self._places = places
+
+    def add_place(self, place):
+        """
+        Add a place to the user's list of places.
+        
+        Args:
+            place (Place): The place to add.
+        """
+        from place import Place
+        if not isinstance(place, Place):
+            raise TypeError("place must be a Place instance")
+        self._places.append(place)
 
     @property
     def first_name(self):
