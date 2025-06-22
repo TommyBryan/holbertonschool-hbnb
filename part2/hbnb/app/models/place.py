@@ -1,4 +1,4 @@
-from base_class import BaseModel
+from app.models.base_class import BaseModel
 from user import User
 from review import Review
 from amenity import Amenity

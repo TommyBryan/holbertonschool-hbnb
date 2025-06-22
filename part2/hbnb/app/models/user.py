@@ -1,4 +1,4 @@
-from base_class import BaseModel
+from app.models.base_class import BaseModel
 import re
 
 class User(BaseModel):
