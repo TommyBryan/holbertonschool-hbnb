@@ -2,7 +2,19 @@ from app.models.base_class import BaseModel
 import re
 
 class User(BaseModel):
+    """
+    User model cls inherits from BaseModel.
+    """
     def __init__(self, first_name, last_name, email, is_admin=False):
+        """
+        Initialize a User instance.
+
+        Args:
+            first_name (str): The first name of the user.
+            last_name (str): The last name of the user.
+            email (str): The email of the user.
+            is_admin (bool): The admin status of the user. Defaults to False.
+        """
         super().__init__()
         self.first_name = first_name
         self.last_name = last_name
