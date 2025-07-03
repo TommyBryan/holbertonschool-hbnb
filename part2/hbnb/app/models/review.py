@@ -1,14 +1,13 @@
 from app.models.base_class import BaseModel
-from place import Place
-from user import User
+
 
 class Review(BaseModel):
     def __init__(self, text, rating, place, user):
         super().__init__()
         self.text = text
         self.rating = rating
-        self. place = place
-        self.user = user
+        self.place = place
+        self._user = user
 
     @property
     def text(self):
@@ -40,6 +39,7 @@ class Review(BaseModel):
     
     @place.setter
     def place(self, place):
+        from .place import Place
         if not isinstance(place, Place):
             raise ValueError("Place does not exist")
         self._place = place
@@ -50,6 +50,7 @@ class Review(BaseModel):
     
     @user.setter
     def user(self, user):
+        from .user import User
         if not isinstance(user, User):
             raise ValueError("User does not exist")
         self._user = user

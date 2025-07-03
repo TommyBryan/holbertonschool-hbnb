@@ -19,7 +19,7 @@ class User(BaseModel):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
-        self.is_admin = is_admin
+        self._is_admin = is_admin
         self.places = []  # List to store related places
 
     @property

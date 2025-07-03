@@ -1,2 +1,5 @@
 venv/
 __pycache__/
+test_place.py
+test_user.py
+test_amenity.py

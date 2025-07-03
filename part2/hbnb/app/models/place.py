@@ -1,7 +1,5 @@
 from app.models.base_class import BaseModel
-from user import User
-from review import Review
-from amenity import Amenity
+
 
 class Place(BaseModel):
     def __init__(self, title, price, latitude, longitude, owner, description=""):
@@ -11,12 +9,13 @@ class Place(BaseModel):
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
-        self.owner = owner
+        self._owner = owner
         self._reviews = []  # List to store related reviews
         self._amenities = []  # List to store related amenities
 
     def add_review(self, review):
         """ Add a review to the place."""
+        from .review import Review
         if not isinstance(review, Review):
             raise TypeError("Review must be an instance of Review")
         self._reviews.append(review)
@@ -73,7 +72,7 @@ class Place(BaseModel):
     
     @price.setter
     def price(self, price):
-        if not isinstance(price, float):
+        if not isinstance(price, (int, float)):
             raise TypeError("Price must be a float")
         if price < 0:
             raise ValueError("Price must be a positive number")
@@ -109,6 +108,7 @@ class Place(BaseModel):
 
     @owner.setter
     def owner(self, owner):
+        from .user import User
         if not isinstance(owner, User):
             raise TypeError("Owner must be a User instance")
         self._owner = owner
