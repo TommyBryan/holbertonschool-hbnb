@@ -9,6 +9,7 @@ class HBnBFacade:
         self.user_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
+    """ User facade. """
     def create_user(self, user_data):
         user = User(**user_data)
         self.user_repo.add(user)
@@ -19,6 +20,8 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
+    
+    """ Amenity facade. """
 
     def create_amenity(self, amenity_data):
         amenity = Amenity(**amenity_data)
