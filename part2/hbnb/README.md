@@ -36,6 +36,13 @@ hbnb/
 ├── README.md
 ```
 
+### Business Logic
+Implemented key entities:
+- **User** - sign in user
+- **Place** - Property
+- **Review** - users reviews
+- **Amenity** - features in the place
+
 ### Explanation:
 
 - The `app/` directory contains the core application code.
