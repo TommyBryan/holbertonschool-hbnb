@@ -1,4 +1,5 @@
-venv/
+.venv/
+.vscode/
 __pycache__/
 test_place.py
 test_user.py
