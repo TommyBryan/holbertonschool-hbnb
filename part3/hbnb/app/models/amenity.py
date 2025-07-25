@@ -1,7 +1,9 @@
 from app.models.base_class import BaseModel
 
 class Amenity(BaseModel):
-    def __init__(self,name):
+    def __init__(self, name):
+        super().__init__()
+        self.validate_name(name)
         self.name = name
 
     def validate_name(self, name):

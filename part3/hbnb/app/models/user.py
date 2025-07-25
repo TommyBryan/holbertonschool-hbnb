@@ -22,7 +22,7 @@ class User(BaseModel):
         self.last_name = last_name
         self.email = email
         self._is_admin = is_admin
-        self.places = []  # List to store related places
+        self._places = []  # List to store related places
         self._password = None
         if password is not None:
             self.hash_password(password)
@@ -52,15 +52,12 @@ class User(BaseModel):
             list: List of Place objects.
         """
         return self._places
-    
+
     @places.setter
     def places(self, places):
         if not isinstance(places, list):
             raise TypeError("Places must be a list")
-        for place in places:
-            from place import Place
-            if not isinstance(place, Place):
-                raise TypeError("All items in places must be Place instances")
+        # Avoid import issues by not checking Place type here
         self._places = places
 
     def add_place(self, place):
@@ -70,9 +67,7 @@ class User(BaseModel):
         Args:
             place (Place): The place to add.
         """
-        from place import Place
-        if not isinstance(place, Place):
-            raise TypeError("place must be a Place instance")
+        # Avoid import issues by not checking Place type here
         self._places.append(place)
 
     @property
@@ -116,6 +111,11 @@ class User(BaseModel):
         email_regex = r"^[\w\.-]+@[\w\.-]+\.\w+$"
         if not re.match(email_regex, email):
             raise ValueError("Invalid email format")
+        self._email = email
+
+    @property
+    def is_admin(self):
+        return self._is_admin
         # Uniqueness check should be handled at a higher level (e.g., database)
         self._email = email
 
