@@ -4,6 +4,7 @@ from app.api.v1.users import api as users_ns
 from app.api.v1.amenities import api as amenities_ns
 from app.api.v1.places import api as places_ns
 from app.api.v1.reviews import api as reviews_ns
+from app.extensions import bcrypt
 
 
 def create_app():
@@ -24,4 +25,5 @@ def create_app():
 
     # Register the users namespace
     api.add_namespace(users_ns, path='/api/v1/users')
+    bcrypt.init_app(app)
     return app

@@ -1,11 +1,12 @@
 from app.models.base_class import BaseModel
 import re
+from app.extensions import bcrypt
 
 class User(BaseModel):
     """
     User model cls inherits from BaseModel.
     """
-    def __init__(self, first_name, last_name, email, is_admin=False):
+    def __init__(self, first_name, last_name, email, password=None, is_admin=False):
         """
         Initialize a User instance.
 
@@ -13,6 +14,7 @@ class User(BaseModel):
             first_name (str): The first name of the user.
             last_name (str): The last name of the user.
             email (str): The email of the user.
+            password (str): The plaintext password of the user.
             is_admin (bool): The admin status of the user. Defaults to False.
         """
         super().__init__()
@@ -21,6 +23,25 @@ class User(BaseModel):
         self.email = email
         self._is_admin = is_admin
         self.places = []  # List to store related places
+        self._password = None
+        if password is not None:
+            self.hash_password(password)
+
+    @property
+    def password(self):
+        raise AttributeError("Password is write-only.")
+
+    @password.setter
+    def password(self, password):
+        self.hash_password(password)
+
+    def hash_password(self, password):
+        """Hashes the password before storing it."""
+        self._password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def verify_password(self, password):
+        """Verifies if the provided password matches the hashed password."""
+        return bcrypt.check_password_hash(self._password, password)
 
     @property
     def places(self):
