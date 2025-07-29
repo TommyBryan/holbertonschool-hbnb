@@ -8,6 +8,7 @@
 </head>
 <body>
     <header>
+        <img src="images/logo.png" alt="Logo" class="logo" id="logo">
         <nav>
             <a href="login.html" id="login-link">Login</a>
         </nav>
@@ -20,9 +21,29 @@
             </select>
         </section>
         <section id="places-list">
-            <!-- List of places will be populated dynamically -->
+            <!--
+            Dynamically populate each place as:
+            <div class="place-card">
+                <h3>Place Name</h3>
+                <p class="price">$100/night</p>
+                <button class="details-button">View Details</button>
+            </div>
+            -->
+            <div class="place-card">
+                <h3>Example Place</h3>
+                <p class="price">$100/night</p>
+                <button class="details-button">View Details</button>
+            </div>
+            <div class="place-card">
+                <h3>Lounge Cabin</h3>
+                <p class="price">$50/night</p>
+                <button class="details-button">View Details</button>
+            </div>
         </section>
     </main>
+    <footer>
+        <p> © 2025 All rights reserved </p>
+    </footer>
     <script src="scripts.js"></script>
 </body>
 </html>
