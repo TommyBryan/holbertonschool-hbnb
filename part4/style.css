@@ -16,8 +16,8 @@ body {
 }
 
 header {
-    background-color: #333;
-    color: #fff;
+    background-color: #b41313;
+    color: #5b2020;
     padding: 1rem;
 }
 
@@ -29,4 +29,11 @@ nav a {
 
 main {
     padding: 2rem;
+}
+
+.place-card {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
 }
