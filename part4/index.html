@@ -8,8 +8,10 @@
 </head>
 <body>
     <header>
+        <img src="images/logo.png" alt="Logo" class="logo" id="logo">
         <nav>
-            <a href="login.html" id="login-link">Login</a>
+            <a href="login.html" class="login-button" id="login-link">Login</a>
+            <a href="index.html" id="index-link">Home</a>
         </nav>
     </header>
     <main>
@@ -20,9 +22,18 @@
             </select>
         </section>
         <section id="places-list">
-            <!-- List of places will be populated dynamically -->
+            <!-- Example static card, replace or duplicate dynamically as needed -->
+            <div class="place-card">
+                <h3>Sample Place Name</h3>
+                <p>Price per night: <strong>$120</strong></p>
+                <a href="place.html" class="details-button">View Details</a>
+            </div>
+            <!-- ...more .place-card elements can be added dynamically... -->
         </section>
     </main>
+    <footer>
+        <p> All rights reserved. </p>
+    </footer>
     <script src="scripts.js"></script>
 </body>
 </html>
