@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('users', description='User operations')
@@ -33,7 +34,7 @@ class UserList(Resource):
 
         return {
             'id': new_user.id,
-            'message': "User successfully crated"
+            'message': "User successfully created"
             }, 201
     
 @api.route('/<user_id>')
@@ -45,9 +46,11 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
+        
         return {
             'id': user.id,
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'email': user.email
+            'email': user.email,
+            'places': user.places,
         }, 200

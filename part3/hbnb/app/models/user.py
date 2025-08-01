@@ -35,10 +35,14 @@ class User(BaseModel):
     def password(self, password):
         self.hash_password(password)
 
+#  This function takes a plaintext password and hashes it using bcrypt, and srore the the
+#  hashed version in the password attribute.
     def hash_password(self, password):
         """Hashes the password before storing it."""
         self._password = bcrypt.generate_password_hash(password).decode('utf-8')
 
+#  This function compares a plaintext password with the hashed password stored in the _password attribute.
+#  It returns True if they match, otherwise False.
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
         return bcrypt.check_password_hash(self._password, password)
