@@ -1,23 +1,24 @@
 from app.models.base_class import BaseModel
 import re
 from app import db, bcrypt
+from sqlalchemy.ext.hybrid import hybrid_property
 
 class User(BaseModel):
-     """
+    """
     User model class that inherits from BaseModel.
 
     Represents a user with first name, last name, email, password, and admin status.
     Handles password hashing and validation, and maintains a relationship with Place instances.
     """
-     __tablename__ = 'users'
+    __tablename__ = 'users'
 
-     first_name = db.Column(db.String(50), nullable=False)
-     last_name = db.Column(db.String(50), nullable=False)
-     email = db.Column(db.String(120), nullable=False, unique=True)
-     password = db.Column(db.String(128), nullable=False)
-     is_admin = db.Column(db.Boolean, default=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
-    @property
+    @hybrid_property
     def password(self):
         raise AttributeError("Password is write-only.")
 
@@ -25,14 +26,14 @@ class User(BaseModel):
     def password(self, password):
         self.hash_password(password)
 
-#  This function takes a plaintext password and hashes it using bcrypt, and srore the the
-#  hashed version in the password attribute.
+    # This function takes a plaintext password and hashes it using bcrypt, and store the
+    # hashed version in the password attribute.
     def hash_password(self, password):
         """Hashes the password before storing it."""
         self._password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-#  This function compares a plaintext password with the hashed password stored in the _password attribute.
-#  It returns True if they match, otherwise False.
+    # This function compares a plaintext password with the hashed password stored in the _password attribute.
+    # It returns True if they match, otherwise False.
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
         return bcrypt.check_password_hash(self._password, password)
