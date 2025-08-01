@@ -1,31 +1,21 @@
 from app.models.base_class import BaseModel
 import re
-from app.extensions import bcrypt
+from app import db, bcrypt
 
 class User(BaseModel):
-    """
-    User model cls inherits from BaseModel.
-    """
-    def __init__(self, first_name, last_name, email, password=None, is_admin=False):
-        """
-        Initialize a User instance.
+     """
+    User model class that inherits from BaseModel.
 
-        Args:
-            first_name (str): The first name of the user.
-            last_name (str): The last name of the user.
-            email (str): The email of the user.
-            password (str): The plaintext password of the user.
-            is_admin (bool): The admin status of the user. Defaults to False.
-        """
-        super().__init__()
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self._is_admin = is_admin
-        self._places = []  # List to store related places
-        self._password = None
-        if password is not None:
-            self.hash_password(password)
+    Represents a user with first name, last name, email, password, and admin status.
+    Handles password hashing and validation, and maintains a relationship with Place instances.
+    """
+     __tablename__ = 'users'
+
+     first_name = db.Column(db.String(50), nullable=False)
+     last_name = db.Column(db.String(50), nullable=False)
+     email = db.Column(db.String(120), nullable=False, unique=True)
+     password = db.Column(db.String(128), nullable=False)
+     is_admin = db.Column(db.Boolean, default=False)
 
     @property
     def password(self):
