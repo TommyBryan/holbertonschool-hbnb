@@ -18,7 +18,9 @@ def create_app(config_class="config.DevelopmentConfig"):
     Returns:
         Flask: The configured Flask application instance.
     """
-    app = Flask(__name__) 
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+
     bcrypt.init_app(app)
     jwt.init_app(app)
 
