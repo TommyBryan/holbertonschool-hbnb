@@ -54,3 +54,36 @@ class UserResource(Resource):
             'email': user.email,
             'places': user.places,
         }, 200
+
+    @jwt_required()
+    @api.response(200, 'User updated successfully')
+    @api.response(404, 'User not found')
+    @api.response(403, 'Unauthorized action')
+    @api.response(400, 'Invalid input data')
+    def put(self, user_id):
+        """Update user info (only self, cannot change email or password)"""
+        current_user = get_jwt_identity()
+        if str(current_user["id"]) != str(user_id):
+            return {"error": "Unauthorized action."}, 403
+
+        user = facade.get_user(user_id)
+        if not user:
+            return {'error': 'User not found'}, 404
+
+        update_data = api.payload or {}
+        # Prevent changing email or password
+        if "email" in update_data or "password" in update_data:
+            return {"error": "You cannot modify email or password."}, 400
+        try:
+            facade.update_user(user_id, update_data)
+        except Exception as e:
+            return {"error": f"Invalid input data {e}"}, 400
+
+        updated_user = facade.get_user(user_id)
+        return {
+            'id': updated_user.id,
+            'first_name': updated_user.first_name,
+            'last_name': updated_user.last_name,
+            'email': updated_user.email,
+            'places': updated_user.places,
+        }, 200
