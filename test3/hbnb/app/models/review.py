@@ -9,8 +9,9 @@ class Review(BaseModel):
 
     text = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, nullable=False)
-    place_id = db.Column(db.Integer, db.ForeignKey('places.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    # Temporarily store as String without foreign key constraints
+    place_id = db.Column(db.String(36), nullable=False)
+    user_id = db.Column(db.String(36), nullable=False)
 
     # Relationship
     place = db.relationship('Place', back_populates='reviews')
