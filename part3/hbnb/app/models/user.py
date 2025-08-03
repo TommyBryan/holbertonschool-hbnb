@@ -1,103 +1,51 @@
-from app.models.base_class import BaseModel
-import re
+#!/usr/bin/python3
+"""User Model"""
+from app import db, bcrypt
+from .base_class import BaseModel
+
 
 class User(BaseModel):
-    """
-    User model cls inherits from BaseModel.
-    """
-    def __init__(self, first_name, last_name, email, is_admin=False):
-        """
-        Initialize a User instance.
+    """"Defines a User with atrributes inherited from (SQLALCHEMY model)"""
+    __tablename__ = 'users'  # Define the table name
 
-        Args:
-            first_name (str): The first name of the user.
-            last_name (str): The last name of the user.
-            email (str): The email of the user.
-            is_admin (bool): The admin status of the user. Defaults to False.
-        """
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True, index=True)
+    password_hash = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+    places = db.relationship('Place', back_populates='owner', cascade="all, delete-orphan")
+    reviews = db.relationship('Review', back_populates='user', cascade="all, delete-orphan")
+
+    def __init__(self, first_name, last_name, email, password=None, is_admin=False):
+        """Initialize a User instance"""
         super().__init__()
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self._is_admin = is_admin
-        self.places = []  # List to store related places
+        self.first_name = self._validate_string(first_name, "First name")
+        self.last_name = self._validate_string(last_name, "Last name")
+        self.email = self._validate_email(email)
+        self.is_admin = is_admin
 
-    @property
-    def places(self):
-        """
-        Get the list of places associated with the user.
-        
-        Returns:
-            list: List of Place objects.
-        """
-        return self._places
-    
-    @places.setter
-    def places(self, places):
-        if not isinstance(places, list):
-            raise TypeError("Places must be a list")
-        for place in places:
-            from place import Place
-            if not isinstance(place, Place):
-                raise TypeError("All items in places must be Place instances")
-        self._places = places
+        # Hash password if provided
+        if password:
+            self.hash_password(password)
 
-    def add_place(self, place):
-        """
-        Add a place to the user's list of places.
-        
-        Args:
-            place (Place): The place to add.
-        """
-        from place import Place
-        if not isinstance(place, Place):
-            raise TypeError("place must be a Place instance")
-        self._places.append(place)
+    def hash_password(self, password):
+        """Hashes the password before storing it."""
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    @property
-    def first_name(self):
-        """
-        Get the first name of the user.
-        
-        Returns:
-            str: First name of the user.
-        """
-        return self._first_name
+    def verify_password(self, password):
+        """Verifies if the provided password matches the hashed password."""
+        return bcrypt.check_password_hash(self.password_hash, password)
 
-    @first_name.setter
-    def first_name(self, first_name):
-        if not isinstance(first_name, str):
-            raise TypeError("First name must be a string")
-        if len(first_name) > 50:
-            raise ValueError("Maximum length for first name is 50 characters")
-        self._first_name = first_name
-
-    @property
-    def last_name(self):
-        return self._last_name
-    
-    @last_name.setter
-    def last_name(self, last_name):
-        if not isinstance(last_name, str):
-            raise TypeError("Last name must be a string")
-        if len(last_name) > 50:
-            raise ValueError("Maximum length for last name is 50 characters")
-        self._last_name = last_name
-
-    @property
-    def email(self):
-        return self._email
-    
-    @email.setter
-    def email(self, email):
-        if not isinstance(email, str):
-            raise TypeError("Email must be a string")
-        email_regex = r"^[\w\.-]+@[\w\.-]+\.\w+$"
-        if not re.match(email_regex, email):
-            raise ValueError("Invalid email format")
-        # Uniqueness check should be handled at a higher level (e.g., database)
-        self._email = email
-
-    @property
-    def is_admin(self):
-        return self._is_admin
+    def to_dict(self):
+        """Convert user to dictionary"""
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'is_admin': self.is_admin,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+            # Note: password_hash is excluded for security
+        }
