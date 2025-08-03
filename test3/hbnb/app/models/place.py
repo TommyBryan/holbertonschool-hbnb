@@ -5,8 +5,8 @@ from .base_class import BaseModel
 
 place_amenity = db.Table(
     'place_amenity',
-    db.Column('place_id', db.Integer, db.ForeignKey('places.id'), primary_key=True),
-    db.Column('amenity_id', db.Integer, db.ForeignKey('amenities.id'), primary_key=True)
+    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
 )
 
 class Place(BaseModel):
@@ -18,23 +18,21 @@ class Place(BaseModel):
     price = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
 
     # Relationship
     owner = db.relationship('User', back_populates='places')
     reviews = db.relationship('Review', back_populates='place', cascade="all, delete-orphan")
     amenities = db.relationship('Amenity', secondary=place_amenity, back_populates='places')
 
-    def __init__(self, title, description, price, latitude, longitude, owner):
+    def __init__(self, title, description, price, latitude, longitude, owner_id):
         super().__init__()
         self.title = self._validate_string(title, "Title")
         self.description = self._validate_string(description, "Description")
         self.price = self._validate_price(price)
         self.latitude = self._validate_coordinate(latitude, "Latitude")
         self.longitude = self._validate_coordinate(longitude, "Longitude")
-        self.owner = self._validate_owner(owner)
-        self.reviews = []  # list to store related reviews
-        self.amenities = []  # list to store related amenities
+        self.owner_id = owner_id
 
     def _validate_string(self, value, field_name):
         """Validates that a value is a non-empty string"""
@@ -54,11 +52,13 @@ class Place(BaseModel):
             raise ValueError(f"{field_name} must be a valid coordinate")
         return float(value)
 
-    def _validate_owner(self, owner):
-        """Validates that the owner is a valid User"""
-        if not isinstance(owner, User):
-            raise ValueError("Owner must be a User")
-        return owner.id
+    def _validate_owner(self, owner_id):
+        """Validates that the owner exists"""
+        from app.services import facade
+        owner = facade.get_user(owner_id)
+        if not owner:
+            raise ValueError("Owner must be a valid User")
+        return owner_id
 
     def add_review(self, review):
         """add a review to the place"""
@@ -82,3 +82,17 @@ class Place(BaseModel):
                 f"latitude={self.latitude}, longitude={self.longitude}, "
                 f"owner='{self.owner}', reviews={len(self.reviews)}, "
                 f"amenities={len(self.amenities)})")
+
+    def to_dict(self):
+        """Convert place to dictionary"""
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'price': self.price,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'owner_id': self.owner_id,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
