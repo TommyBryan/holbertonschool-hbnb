@@ -1,4 +1,4 @@
-from app.persistence.repository import InMemoryRepository
+from app.persistence.repository import SQLAlchemyRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.amenity import Amenity
@@ -6,8 +6,7 @@ from app.models.review import Review
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = SQLAlchemyRepository(User)
 
     """ User facade. """
     def create_user(self, user_data):
@@ -20,7 +19,10 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
-    
+
+    def update_user(self, user_id, user_data):
+        self.user_repo.update(user_id, user_data)
+
     """ Amenity facade. """
 
     def create_amenity(self, amenity_data):
@@ -38,7 +40,7 @@ class HBnBFacade:
         return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id, amenity_data):
-        self.ameity_repo.update(amenity_id, amenity_data)
+        self.amenity_repo.update(amenity_id, amenity_data)
 
     """ PLaces facade. """
 
@@ -90,16 +92,15 @@ class HBnBFacade:
         """
         return self.review_repo.get_all()
 
-
     def get_reviews_by_place(self, place_id):
         """
         Get review by place.
         """
         place = self.place_repo.get(place_id)
         if not place:
-            return None
-        reviews = [self.review_repo.get(review) for review in place.reviews]
-        return reviews
+            return []
+        reviews = [self.review_repo.get(review_id) for review_id in getattr(place, "reviews", [])]
+        return [r for r in reviews if r]
 
     def update_review(self, review_id, review_data):
         """
@@ -108,7 +109,7 @@ class HBnBFacade:
         self.review_repo.update(review_id, review_data)
 
     def delete_review(self, review_id):
-         """
-         Delete review.
-         """
-         self.review_repo.delete(review_id)
+        """
+        Delete review.
+        """
+        self.review_repo.delete(review_id)
