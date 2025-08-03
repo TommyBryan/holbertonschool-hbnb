@@ -1,42 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Review</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <header>
-        <img src="images/logo.png" alt="Logo" class="logo" id="logo">
-        <nav>
-            <a href="login.html" class="login-button" id="login-link">Login</a>
-            <a href="index.html" id="index-link">Home</a>
-        </nav>
+      <img src="images/logo.png" alt="Logo" class="logo" id="logo" />
+      <nav>
+        <a href="login.html" class="login-button" id="login-link">Login</a>
+        <a href="#" id="logout-link" onclick="logout()" style="display: none"
+          >Logout</a
+        >
+        <a href="index.html" id="index-link">Home</a>
+      </nav>
     </header>
     <main>
-        <section class="add-review">
-            <!-- Add something to identify the place you're reviewing -->
-            <form id="review-form" class="form">
-                <h2>Add a Review</h2>
-                <label for="review">Your Review:</label>
-                <textarea id="review" name="review" required></textarea>
-                <label for="rating">Rating:</label>
-                <select id="rating" name="rating" required>
-                    <option value="">Select rating</option>
-                    <option value="5">★★★★★</option>
-                    <option value="4">★★★★☆</option>
-                    <option value="3">★★★☆☆</option>
-                    <option value="2">★★☆☆☆</option>
-                    <option value="1">★☆☆☆☆</option>
-                </select>
-                <button type="submit">Submit Review</button>
-            </form>
-        </section>
+      <section class="place-summary" id="place-summary">
+        <!-- Place information will be populated here -->
+      </section>
+      <section class="add-review">
+        <form id="review-form" class="form">
+          <h2>Add a Review</h2>
+          <label for="review">Your Review:</label>
+          <textarea id="review" name="review" required></textarea>
+          <label for="rating">Rating:</label>
+          <select id="rating" name="rating" required>
+            <option value="">Select rating</option>
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="1">★☆☆☆☆</option>
+          </select>
+          <button type="submit">Submit Review</button>
+        </form>
+      </section>
     </main>
     <footer>
-        <p> © 2025 All rights reserved. </p>
+      <p>© 2025 All rights reserved.</p>
     </footer>
-    <script src="scripts.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
