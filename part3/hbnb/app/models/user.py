@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """User Model"""
-from app import db, bcrypt
+from app.extensions import db, bcrypt
 from .base_class import BaseModel
 
 

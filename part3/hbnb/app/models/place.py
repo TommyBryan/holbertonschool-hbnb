@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Place Model"""
-from app import db
+from app.extensions import db
 from .base_class import BaseModel
 
 place_amenity = db.Table(

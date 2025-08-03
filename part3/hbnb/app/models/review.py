@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from app import db
+from app.extensions import db
 from .base_class import BaseModel
 
 
