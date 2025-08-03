@@ -1,115 +1,80 @@
 from app.models.base_class import BaseModel
-from app import bcrypt
 import re
+from app import db, bcrypt
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import validates
 
 class User(BaseModel):
     """
-    User model cls inherits from BaseModel.
+    User model class that inherits from BaseModel.
+
+    Represents a user with first name, last name, email, password, and admin status.
+    Handles password hashing and validation, and maintains a relationship with Place instances.
     """
-    def __init__(self, first_name, last_name, email, is_admin=False, password=None):
-        """
-        Initialize a User instance.
+    __tablename__ = 'users'
 
-        Args:
-            first_name (str): The first name of the user.
-            last_name (str): The last name of the user.
-            email (str): The email of the user.
-            is_admin (bool): The admin status of the user. Defaults to False.
-            password (str): The password of the user.
-        """
-        super().__init__()
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self._is_admin = is_admin
-        self.places = []  # List to store related places
-        if password:
-            self.hash_password(password)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    _password = db.Column('password', db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
-    def hash_password(self, password):
-        """Hashes the password before storing it."""
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
-
-    def verify_password(self, password):
-        """Verifies if the provided password matches the hashed password."""
-        return bcrypt.check_password_hash(self.password, password)
-
-    @property
-    def places(self):
-        """
-        Get the list of places associated with the user.
-        
-        Returns:
-            list: List of Place objects.
-        """
-        return self._places
-    
-    @places.setter
-    def places(self, places):
-        if not isinstance(places, list):
-            raise TypeError("Places must be a list")
-        for place in places:
-            from place import Place
-            if not isinstance(place, Place):
-                raise TypeError("All items in places must be Place instances")
-        self._places = places
-
-    def add_place(self, place):
-        """
-        Add a place to the user's list of places.
-        
-        Args:
-            place (Place): The place to add.
-        """
-        from place import Place
-        if not isinstance(place, Place):
-            raise TypeError("place must be a Place instance")
-        self._places.append(place)
-
-    @property
-    def first_name(self):
-        """
-        Get the first name of the user.
-        
-        Returns:
-            str: First name of the user.
-        """
-        return self._first_name
-
-    @first_name.setter
-    def first_name(self, first_name):
+    # SQLAlchemy validators
+    @validates('first_name')
+    def validate_first_name(self, key, first_name):
         if not isinstance(first_name, str):
             raise TypeError("First name must be a string")
         if len(first_name) > 50:
             raise ValueError("Maximum length for first name is 50 characters")
-        self._first_name = first_name
+        return first_name
 
-    @property
-    def last_name(self):
-        return self._last_name
-    
-    @last_name.setter
-    def last_name(self, last_name):
+    @validates('last_name')
+    def validate_last_name(self, key, last_name):
         if not isinstance(last_name, str):
             raise TypeError("Last name must be a string")
         if len(last_name) > 50:
             raise ValueError("Maximum length for last name is 50 characters")
-        self._last_name = last_name
+        return last_name
 
-    @property
-    def email(self):
-        return self._email
-    
-    @email.setter
-    def email(self, email):
+    @validates('email')
+    def validate_email(self, key, email):
         if not isinstance(email, str):
             raise TypeError("Email must be a string")
         email_regex = r"^[\w\.-]+@[\w\.-]+\.\w+$"
         if not re.match(email_regex, email):
             raise ValueError("Invalid email format")
-        # Uniqueness check should be handled at a higher level (e.g., database)
-        self._email = email
+        return email
 
+    @hybrid_property
+    def password(self):
+        raise AttributeError("Password is write-only.")
+
+    @password.setter
+    def password(self, password):
+        self.hash_password(password)
+
+    def hash_password(self, password):
+        """Hashes the password before storing it."""
+        self._password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def verify_password(self, password):
+        """Verifies if the provided password matches the hashed password."""
+        return bcrypt.check_password_hash(self._password, password)
+
+    # Keep custom properties only for attributes that aren't SQLAlchemy columns
     @property
-    def is_admin(self):
-        return self._is_admin
+    def places(self):
+        """Get the list of places associated with the user."""
+        return getattr(self, '_places', [])
+
+    @places.setter
+    def places(self, places):
+        if not isinstance(places, list):
+            raise TypeError("Places must be a list")
+        self._places = places
+
+    def add_place(self, place):
+        """Add a place to the user's list of places."""
+        if not hasattr(self, '_places'):
+            self._places = []
+        self._places.append(place)

@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
@@ -13,14 +14,37 @@ review_model = api.model('Review', {
 
 @api.route('/')
 class ReviewList(Resource):
+    @jwt_required()
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Unauthorized action')
     def post(self):
         """
-        Register a new review using JSON payload with text, rating, user_id, and place_id.
+        Register a new review (authenticated users only).
+        Prevent reviewing own place and duplicate reviews.
         """
+        current_user = get_jwt_identity()
         review_data = api.payload
+        user_id = current_user["id"]
+        place_id = review_data.get("place_id")
+
+        # Prevent reviewing own place
+        place = facade.get_place(place_id)
+        if not place:
+            return {"error": "Invalid place"}, 400
+        if str(place.owner_id) == str(user_id):
+            return {"error": "You cannot review your own place."}, 400
+
+        # Prevent duplicate review for same place by same user
+        all_reviews = facade.get_all_reviews()
+        for review in all_reviews:
+            if getattr(review, "user_id", None) == user_id and getattr(review, "place_id", None) == place_id:
+                return {"error": "You have already reviewed this place."}, 400
+
+        # Force user_id to be the current user
+        review_data["user_id"] = user_id
+
         try:
             new_review = facade.create_review(review_data)
         except Exception as e:
@@ -71,19 +95,24 @@ class ReviewResource(Resource):
             "place_id": review.place_id
         }, 200
 
+    @jwt_required()
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Unauthorized action')
     def put(self, review_id):
         """
-        Update a review's information.
+        Update a review's information (only creator).
         """
-        update_review_data = api.payload
+        current_user = get_jwt_identity()
         review_to_update = facade.get_review(review_id)
         if not review_to_update:
             return {'error': 'Review not found'}, 404
+        if str(review_to_update.user_id) != str(current_user["id"]):
+            return {"error": "Unauthorized action."}, 403
 
+        update_review_data = api.payload
         try:
             facade.update_review(review_id, update_review_data)
         except Exception as e:
@@ -91,14 +120,20 @@ class ReviewResource(Resource):
 
         return {"message": "Review updated!"}, 200
 
+    @jwt_required()
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
+    @api.response(403, 'Unauthorized action')
     def delete(self, review_id):
         """
-        Delete a review by ID.
+        Delete a review by ID (only creator).
         """
-        if not facade.get_review(review_id):
+        current_user = get_jwt_identity()
+        review = facade.get_review(review_id)
+        if not review:
             return {'error': 'Review not found'}, 404
+        if str(review.user_id) != str(current_user["id"]):
+            return {"error": "Unauthorized action."}, 403
 
         facade.delete_review(review_id)
         return {"message": "Review deleted!"}, 200
